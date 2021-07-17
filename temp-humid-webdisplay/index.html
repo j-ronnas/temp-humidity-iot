@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>Temperature and humidity</title>
+</head>
+<body>
+    <h2>Temperature and humidity</h2>
+    <div class="flexbox-container">
+        <div class="current-values">
+            <div id="temp-display">
+                The current temp is: 30 C
+            </div>
+            <div id="rh-display">
+                The current humidity is:
+            </div>
+            <div id="time-display">
+                Measured at: 11:34
+            </div>
+        </div>
+        
+    
+        <div class="chart-container" style="width: 70vh;">
+            <canvas id="temp-chart" ></canvas>
+          </div>
+        
+          <div class="chart-container" style="width: 70vh;">
+            <canvas id="rh-chart" ></canvas>
+          </div>
+
+    </div>
+    
+   
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script src="main.js"></script>
+</body>
+</html>

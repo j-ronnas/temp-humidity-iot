@@ -1,0 +1,32 @@
+@import url('https://fonts.googleapis.com/css2?family=Dosis:wght@300&family=Heebo&family=Oxygen:wght@300&display=swap');
+body{
+    padding:0;
+    margin:0;
+    font-family: 'Dosis', sans-serif;
+    background-color: rgb(88, 122, 185);
+}
+
+h2{
+    color:rgb(232, 240, 243);
+    padding: 3vh;
+}
+
+.current-values{
+    background-color: honeydew;
+    margin: 1vh;
+    padding: 2vh;
+
+    border-radius: 0.6em;
+}
+
+.chart-container{
+    background-color: honeydew;
+    margin: 1vh;
+    padding: 2vh;
+
+    border-radius: 0.6em;
+}
+
+.flexbox-container{
+    display: flex;
+}
