@@ -9,7 +9,7 @@ This project consists of a temperature sensor and a humidity sensor which will m
 
 As more and more devices are getting "smarter" there are already many weather stations available with online functionality. These devices come with their own dashboards and interfaces for viewing the collected weather data. However, by building our own custom device we get full control of how the data is stored and presented, giving us the oppertunity to view the statistics that we are interrested in. We also have the oppertunity to expand the weather station with other components and sensors as we see fit. 
 
-A secondary objective of this project is that it serves as a learning project. By writing our own node js server we can get a good understanding of all the different steps and aspects involved in IoT: measuring the data, transmitting it from a device, handling the request, storing data in a database and finally presenting it to the user. 
+A secondary objective of this project is that it serves as a learning project. By writing our own node js server we can get a good understanding of all the different steps and aspects involved in IoT: measuring the data, transmitting it from a device, handling the request, storing data in a database and finally presenting it to the user. As such the focus will be on using alternatives that are simple to use and understand, giving us control of the configuration as opposed to ready made solutions with more functionality. 
 
 
 
@@ -164,7 +164,7 @@ while True:
 ``` 
 To send the data to the server we use a library called urequests (https://makeblock-micropython-api.readthedocs.io/en/latest/public_library/Third-party-libraries/urequests.html). This is the micropython version of the request library which handles http requests, which is installed by simply putting the urequests.py file in the lib-folder. The data from the sensor is put into an object and sent as a post request to the server. I chose to send every ten minutes, but this can be varied to suit your needs. In the post request we specify the IP-address of the server, as well as the port. Here I am using the local ip address of the computer that is running the server togheter with the port number I specified (3000). This will work as long as the lopy device is connected to the same local network as the server. If you would like access the server outside the local network you will need to either host it using a hosting service or setup your own webserver. You can then use the address of this remote server in the http request.
 
-```
+```javascript
 from lib import urequests as requests
 
 while True:
@@ -184,5 +184,142 @@ while True:
 ```
 
 ## Part 5: HTML Website
+
+As described in part 3, any client could get access to the data with the endpoint`/data`. As such we can create a simple HTML website to display the temperature and humdity measured by the lopy4 using javascript to make the request. To create some nice graphs of the readings we will use a javascript library called charts.js.
+
+First of all we write the HTML defining the elements that will make upp the webpage. 
+
+Here is the body of the page
+```html
+<body>
+    <h2>Temperature and humidity</h2>
+    <div class="flexbox-container">
+        <div class="current-values">
+            <div id="temp-display">
+                The current temp is: 30 C
+            </div>
+            <div id="rh-display">
+                The current humidity is:
+            </div>
+            <div id="time-display">
+                Measured at: 11:34
+            </div>
+        </div>
+        
+    
+        <div class="chart-container" style="width: 70vh;">
+            <canvas id="temp-chart" ></canvas>
+          </div>
+        
+          <div class="chart-container" style="width: 70vh;">
+            <canvas id="rh-chart" ></canvas>
+          </div>
+
+    </div>
+    
+   
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script src="main.js"></script>
+```
+
+Here we have two containers, one showing the last reading made by the device, and one with two graphs displaying temperature and humidity over time. Finally we attach two scripts. The first one is for the library chart.js, and the second one is the javascript file used to populate the elements with data, called `main.js`. We also attach a css file called `style.css` which can be seen in the github repo.
+
+Finally we write the javascript code which will add the functionality to the webpage. 
+
+I created a helper function called `DisplayLineChart` for defining a linechart as this will be used several times for the two graphs. 
+
+```javascript
+function DisplayLineChart(label, domID, xData, yData, yRange){
+  let data = {
+    labels: xData,
+    datasets: [{
+      label: label,
+      backgroundColor: 'rgb(255, 99, 132)',
+      borderColor: 'rgb(255, 99, 132)',
+      data: yData,
+    }]
+  };
+
+
+  let config = {
+    type: 'line',
+    data,
+    options: {
+      scales:{
+        y:{
+          suggestedMin: yRange.min,
+          suggestedMax: yRange.max
+        }
+        
+      }
+    }
+  };
+  
+    var myChart = new Chart(
+    document.getElementById(domID),
+    config
+  );
+}
+```
+
+The function takes in a label, which DOM-element which will be used, the xData and yData as well as the range on the y-axis to scale the window. It then defines a data object and a config object which is finally used to create a graph using `new Chart()`. 
+
+
+We then want to get the data from the server and this can be done using the `fetch` function, using promises and the `then` keyword to chain the callbacks when the data is successfully received, as such:
+
+```javascript
+fetch("http://192.168.3.121:3000/data?num=10")
+.then(response => response.json())
+.then((jsonRes) => {
+
+//DEFINE YOUR LOGIC HERE
+
+})
+```
+
+Here `jsonRes` will contain the result from the request as a list of JSON strings, each element representing a data point. To display the current data we get the first element and populate the correct HTML elements.
+
+```javascript
+  tempDisp = document.querySelector("#temp-display")
+  tempDisp.innerHTML = "The current temperature is "+ jsonRes[0]["temp"] + " C"
+
+  rhDisp = document.querySelector("#rh-display")
+  rhDisp.innerHTML = "The current humidity is "+ jsonRes[0]["rh"] + " %"
+  
+  date = new Date(jsonRes[0]['time']*1000)
+  timeDisp = document.querySelector("#time-display")
+  
+  timeDisp.innerHTML = "Measured at: "+ date.toString();
+
+```
+Here we use a `Date` object to interpret the time sent with the data point and converts into something readable. 
+
+Finally we create the necessary things to send to our `DisplayLineChart` from the request result. We have a list for the temperature, humidity and time respectively and use a foreach loop over `jsonRes` to populate them.
+
+```javascript
+  tempData = []
+  timeData = []
+  rhData = []
+  jsonRes.forEach(element => {
+    d = new Date(element.time*1000);
+    timeData.push(d.getHours() + ":" + d.getMinutes());
+    tempData.push(element.temp);
+    rhData.push(element.rh)
+  });
+
+  tempData.reverse();
+  timeData.reverse();
+  rhData.reverse();
+  
+  DisplayLineChart("Temperature", "temp-chart", timeData, tempData, {min:20,max:30})
+  DisplayLineChart("Humidity", "rh-chart", timeData, rhData, {min: 20, max:80})
+```
+
+Note that we need to reverse the lists to get the most recent data last in the list for our graphs to increase from left to right on the x-axis. As usual, all code can be found on the github repo.
+
+
+
 
 
