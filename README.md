@@ -69,6 +69,8 @@ The express app then listens to port 3000, which is just chosen arbitrarily. By 
 
 ### 3.2 Database configuration
 
+There are many different solutions for how to store the data collected, which have different functionalities and considerations. For example have SQL databases been a popular choice for many applications but they require some setup and knowledge of SQL. There are also many alternatives tailored for IoT applications, one being InfluxDB (https://www.influxdata.com/). This database is designed for timeseries data as well as handling frequent additions from multiple sources, which is exactly what you would have if you set up multiple sensor sending datareadings to a server. Furthermore there are datastorage solutions connected to ready made services for IoT such as pybytes, datacake or ubidots. These services makes it easy to connect and send data, they come with some limitations using the free versions. More importantly, as this p
+
 ### 3.3 Handling lopy request
 
 We can then set up the handling of a post-request from the lopy device. Here we receive the data in the body of the request and we add it to the database. 
