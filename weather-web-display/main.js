@@ -33,13 +33,11 @@ function DisplayLineChart(label, domID, xData, yData, yRange){
   );
 }
 
-fetch("http://192.168.3.121:3000/data?num=10")
+fetch("http://192.168.3.125:3000/data?num=10")
 .then(response => response.json())
 .then((jsonRes) => {
   console.log(jsonRes);
-  //console.log(response.json())
 
-  
   tempDisp = document.querySelector("#temp-display")
   tempDisp.innerHTML = "The current temperature is "+ jsonRes[0]["temp"] + " C"
 
@@ -47,7 +45,6 @@ fetch("http://192.168.3.121:3000/data?num=10")
   rhDisp.innerHTML = "The current humidity is "+ jsonRes[0]["rh"] + " %"
   
   date = new Date(jsonRes[0]['time']*1000)
-  //date.setMilliseconds(parseInt(data[0]["time"]))
   timeDisp = document.querySelector("#time-display")
   
   timeDisp.innerHTML = "Measured at: "+ date.toString();
