@@ -407,7 +407,7 @@ app.use(cors());
 ```
 to index.js in the weather-server folder. We could also configure this to only give some clients access, but just specifying `app.use(cors())` allows everything.
 
-## Part 6: Final Thoughts
+## Final Thoughts
 
 If you run the server, upload the code to the lopy and connect it to a power source (I just use the usb connection), and open up your website all should be working! This simple project shows how it is possible to create a Node JS server for your IoT device giving you full control of the data collected. There a number of improvements that can be made to make this both more useful and interesting. 
 
